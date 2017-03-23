@@ -261,6 +261,13 @@ int rd_kafka_sasl_select_provider (rd_kafka_t *rk,
 #else
                 provider = &rd_kafka_sasl_plain_provider;
 #endif
+        } else if (!strcmp(rk->rk_conf.sasl.mechanisms, "SCRAM-SHA-256") ||
+                   !strcmp(rk->rk_conf.sasl.mechanisms, "SCRAM-SHA-512")) {
+                /* SASL SCRAM */
+#if WITH_SASL_SCRAM
+                provider = &rd_kafka_sasl_scram_provider;
+#endif
+
         } else {
                 /* Unsupported mechanism */
                 rd_snprintf(errstr, errstr_size,
@@ -274,7 +281,7 @@ int rd_kafka_sasl_select_provider (rd_kafka_t *rk,
                             "No provider for SASL mechanism %s"
 #ifndef _MSC_VER
                             ": recompile librdkafka with "
-                            "libsasl2/cyrus support"
+                            "libsasl2/openssl support"
 #endif
                             ,
                             rk->rk_conf.sasl.mechanisms);
